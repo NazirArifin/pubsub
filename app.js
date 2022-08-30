@@ -26,7 +26,7 @@ client.on('connect', () => {
   client.subscribe(['air/tinggi'], () => {
     console.log('subscribed');
   }).on('message', async (topic, payload) => {
-    const nilai = JSON.parse(req.body.payload);
+    const nilai = JSON.parse(payload);
     let conn;
     try {
       conn = await pool.getConnection();
