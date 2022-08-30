@@ -25,12 +25,13 @@ client.on('connect', () => {
   console.log('connected');
   client.subscribe(['air/tinggi'], () => {
     console.log('subscribed');
-  }).on('message', (topic, message) => {
-    console.log(topic, message.toString());
+  }).on('message', async (topic, payload) => {
+    const nilai = JSON.parse(req.body.payload);
     let conn;
     try {
       conn = await pool.getConnection();
-      const rows = await conn.query("INSERT INTO tbl_air VALUES (NULL, 8977, NOW())");
+      await conn.query("INSERT INTO tbl_air VALUES (NULL, ?, NOW())", [nilai.tinggiAir]);
+      conn.end();
     } catch (error) {
       console.log(error);
     }
