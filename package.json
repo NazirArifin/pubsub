@@ -1,0 +1,19 @@
+{
+  "name": "pubsub",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "pm2": "npx pm2 start app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mariadb": "^3.0.1",
+    "mqtt": "^4.3.7"
+  },
+  "devDependencies": {
+    "pm2": "^5.2.0"
+  }
+}
