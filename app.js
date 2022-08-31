@@ -23,14 +23,31 @@ const client = mqtt.connect(
 
 client.on('connect', () => {
   console.log('connected');
-  client.subscribe(['air/tinggi'], () => {
+  client.subscribe([
+    'air/tinggi',
+    'nutrisi/tinggi',
+    'air/kondisi',
+    'nutrisi/kondisi',
+  ], () => {
     console.log('subscribed');
   }).on('message', async (topic, payload) => {
     const nilai = JSON.parse(payload);
     let conn;
     try {
       conn = await pool.getConnection();
-      await conn.query("INSERT INTO tbl_air VALUES (NULL, ?, NOW())", [nilai.tinggiAir]);
+      if (topic === 'air/tinggi') {
+        await conn.query("INSERT INTO tbl_air VALUES (NULL, ?, NOW())", [nilai.tinggiAir]);
+      }
+      if (topic === 'nutrisi/tinggi') {
+        await conn.query("INSERT INTO tbl_nutrisi VALUES (NULL, ?, NOW())", [nilai.tinggiNutrisi]);
+      }
+      if (topic === 'air/kondisi') {
+        await conn.query("INSERT INTO tbl_siram_air VALUES (NULL, ?, NOW())", [nilai.siram_air]);
+      }
+      if (topic === 'nutrisi/kondisi') {
+        await conn.query("INSERT INTO tbl_siram_nutris VALUES (NULL, ?, NOW())", [nilai.siram_nutrisi]);
+      }
+      
       conn.end();
     } catch (error) {
       console.log(error);
