@@ -31,6 +31,9 @@ client.on('connect', () => {
   ], () => {
     console.log('subscribed');
   }).on('message', async (topic, payload) => {
+    if(Buffer.isBuffer(payload)){
+      payload = payload.toString();
+    }
     const nilai = JSON.parse(payload);
     let conn;
     try {
@@ -53,46 +56,4 @@ client.on('connect', () => {
       console.log(error);
     }
   });
-
-  // client.subscribe(['nutrisi/tinggi'], () => {
-  //   console.log('subscribed');
-  // }).on('message', async (topic, payload) => {
-  //   const nilai = JSON.parse(payload);
-  //   let conn;
-  //   try {
-  //     conn = await pool.getConnection();
-  //     await conn.query("INSERT INTO tbl_nutrisi VALUES (NULL, ?, NOW())", [nilai.tinggiNutrisi]);
-  //     conn.end();
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // });
-
-  // client.subscribe(['air/kondisi'], () => {
-  //   console.log('subscribed');
-  // }).on('message', async (topic, payload) => {
-  //   const nilai = JSON.parse(payload);
-  //   let conn;
-  //   try {
-  //     conn = await pool.getConnection();
-  //     await conn.query("INSERT INTO tbl_siram_air VALUES (NULL, ?, NOW())", [nilai.siram_air]);
-  //     conn.end();
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // });
-
-  // client.subscribe(['nutrisi/kondisi'], () => {
-  //   console.log('subscribed');
-  // }).on('message', async (topic, payload) => {
-  //   const nilai = JSON.parse(payload);
-  //   let conn;
-  //   try {
-  //     conn = await pool.getConnection();
-  //     await conn.query("INSERT INTO tbl_siram_nutrisi VALUES (NULL, ?, NOW())", [nilai.siram_nutrisi]);
-  //     conn.end();
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // });
 });
