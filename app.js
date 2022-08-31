@@ -24,10 +24,10 @@ const client = mqtt.connect(
 client.on('connect', () => {
   console.log('connected');
   client.subscribe([
-    'air/tinggi',
-    'nutrisi/tinggi',
-    'air/kondisi',
-    'nutrisi/kondisi',
+    'tinggi/air',
+    'tinggi/nutrisi',
+    'kondisi/air',
+    'kondisi/nutrisi',
   ], () => {
     console.log('subscribed');
   }).on('message', async (topic, payload) => {
@@ -38,17 +38,17 @@ client.on('connect', () => {
     let conn;
     try {
       conn = await pool.getConnection();
-      if (topic === 'air/tinggi') {
+      if (topic === 'tinggi/air') {
         await conn.query("INSERT INTO tbl_air VALUES (NULL, ?, NOW())", [nilai.tinggiAir]);
       }
-      if (topic === 'nutrisi/tinggi') {
+      if (topic === 'tinggi/nutrisi') {
         await conn.query("INSERT INTO tbl_nutrisi VALUES (NULL, ?, NOW())", [nilai.tinggiNutrisi]);
       }
-      if (topic === 'air/kondisi') {
-        await conn.query("INSERT INTO tbl_siram_air VALUES (NULL, ?, NOW())", [nilai.siram_air]);
+      if (topic === 'kondisi/air') {
+        await conn.query("INSERT INTO tbl_siram_air VALUES (NULL, ?, NOW())", [nilai.siramAir]);
       }
-      if (topic === 'nutrisi/kondisi') {
-        await conn.query("INSERT INTO tbl_siram_nutris VALUES (NULL, ?, NOW())", [nilai.siram_nutrisi]);
+      if (topic === 'kondisi/nutrisi') {
+        await conn.query("INSERT INTO tbl_siram_nutrisi VALUES (NULL, ?, NOW())", [nilai.siramNutrisi]);
       }
       
       conn.end();
