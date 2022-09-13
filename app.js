@@ -39,10 +39,10 @@ client.on('connect', () => {
     try {
       conn = await pool.getConnection();
       if (topic === 'tinggi/air') {
-        await conn.query("INSERT INTO tbl_air VALUES (NULL, ?, NOW())", [nilai.tinggiAir]);
+        await conn.query("INSERT INTO tbl_air VALUES (NULL, ?, ?, NOW())", [nilai.tinggiAir, nilai.presentase]);
       }
       if (topic === 'tinggi/nutrisi') {
-        await conn.query("INSERT INTO tbl_nutrisi VALUES (NULL, ?, NOW())", [nilai.tinggiNutrisi]);
+        await conn.query("INSERT INTO tbl_nutrisi VALUES (NULL, ?, ?, NOW())", [nilai.tinggiNutrisi, nilai.presentase]);
       }
       if (topic === 'kondisi/air') {
         await conn.query("INSERT INTO tbl_siram_air VALUES (NULL, ?, NOW())", [nilai.siramAir]);
