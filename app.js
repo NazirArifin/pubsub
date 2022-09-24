@@ -57,3 +57,55 @@ client.on('connect', () => {
     }
   });
 });
+
+async function checkSiram(tanggal, jam) {
+  // check ke database
+  try {
+    const conn = await pool.getConnection();
+    const data = await conn.query("SELECT id_siram FROM tbl_siram_air WHERE DATE(time) = ? AND siram_air = ? AND HOUR(time) = ?", [tanggal, 1, jam]);
+    if (data.length == 0) {
+      client.publish('kondisi/air', JSON.stringify({ siramError: 1 }));
+    }
+    conn.end();
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+let counter = 0;
+let currentDate = '';
+let morningMinuteChecks = [];
+let eveningMinuteChecks = [];
+
+function checkDate() {
+  const date = new Date();
+  // today's date
+  const today = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+  if (today !== currentDate) {
+    currentDate = today;
+    morningMinuteChecks = [];
+    eveningMinuteChecks = [];
+  }
+
+  // try to check at minute 20, 25 and 30 at 7 o'clock
+  const minute = date.getMinutes();
+  if (date.getHours() === 7 && (minute === 20 || minute === 25 || minute === 30)) {
+    if (!morningMinuteChecks.includes(minute)) {
+      checkSiram(today, 7);
+      morningMinuteChecks.push(minute);
+    }
+  }
+  // try to check at minute 20, 25 and 30 at 17 o'clock
+  if (date.getHours() === 17 && (minute === 20 || minute === 25 || minute === 30)) {
+    if (!eveningMinuteChecks.includes(minute)) {
+      checkSiram(today, 17);
+      eveningMinuteChecks.push(minute);
+    }
+  }
+  
+  clearInterval(counter);
+  counter = setInterval(checkDate, 3000);
+}
+
+checkDate();
+counter = setTimeout(() => checkDate(), 3000);
