@@ -1,5 +1,21 @@
 import mqtt from 'mqtt';
 import mariadb from 'mariadb';
+import admin from 'firebase-admin';
+import { initializeApp } from 'firebase-admin/app';
+import { readFile } from 'fs/promises';
+
+const serviceAccount = await readFile(new URL('./napote-5f683-firebase-adminsdk-ehfwq-0c07511745.json', import.meta.url));
+initializeApp({
+  credential: admin.credential.cert(JSON.parse(serviceAccount)),
+});
+const fcmTopic = 'siramAir';
+// await admin.messaging().send({
+//   topic: fcmTopic,
+//   notification: {
+//     title: 'Siram Air',
+//     body: `Siram air tanggal 15-09-2022 jam 7 belum dilakukan`
+//   }
+// });
 
 const pool = mariadb.createPool({
   host: 'localhost',
@@ -64,7 +80,13 @@ async function checkSiram(tanggal, jam) {
     const conn = await pool.getConnection();
     const data = await conn.query("SELECT id_siram FROM tbl_siram_air WHERE DATE(time) = ? AND siram_air = ? AND HOUR(time) = ?", [tanggal, 1, jam]);
     if (data.length == 0) {
-      client.publish('kondisi/air', JSON.stringify({ siramError: 1 }));
+      await admin.messaging().send({
+        topic: fcmTopic,
+        notification: {
+          title: 'Siram Air',
+          body: `Siram air tanggal ${tanggal.split('-').reverse().join('-')} jam ${jam} belum dilakukan`
+        }
+      });
     }
     conn.end();
   } catch (error) {
